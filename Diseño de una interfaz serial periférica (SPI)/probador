@@ -1,0 +1,47 @@
+//Modulo para establecer la conexion de los modulos transmisor y receptor
+module SPI_Protocol(clk,ckp,cph,reset,received_data_master,received_data_slave);
+    output reg clk,reset,ckp,cph;
+    output [7:0]received_data_master,received_data_slave;
+    wire sck,ss,mosi,miso;
+
+    SPI_Master_Transmitter SPImaster (
+        .clk(clk),
+        .reset(reset),
+        .sck(sck),
+        .ckp(ckp),
+        .cph(cph),
+        .cs(ss),
+        .mosi(mosi),
+        .miso(miso),
+        .data1(received_data_master)
+        );
+    
+    SPI_Slave_receiver SPIslave (
+        .sck(sck),
+        .ss(ss),
+        .mosi(mosi),
+        .miso(miso),
+        .data(received_data_slave)
+        );
+      initial
+        begin
+            clk = 0;
+            reset = 0;
+        end
+
+    initial begin
+        clk = 1'b0;
+        forever #4 clk = ~clk;
+    end
+
+
+    initial begin
+        ckp=1;
+        cph=1;
+        reset=1'b1;
+        #1000;
+        reset =0;
+        #100
+        $finish;
+    end  
+endmodule 
